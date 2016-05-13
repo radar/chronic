@@ -2,6 +2,8 @@ defmodule Chronic.MonthAndDayTest do
   use ExUnit.Case, async: true
   use Chronic.TestHelpers
 
+  @doctest Chronic
+
   test "month and day" do
     { :ok, time, offset } = Chronic.parse("aug 3")
 

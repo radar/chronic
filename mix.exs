@@ -17,7 +17,9 @@ defmodule Chronic.Mixfile do
 
   defp deps do
     [
-      {:calendar, "~> 0.14.0"}
+      {:calendar, "~> 0.14.0"},
+      {:earmark, "~> 0.1", only: :dev},
+      {:ex_doc, "~> 0.11", only: :dev}
    ]
   end
 
