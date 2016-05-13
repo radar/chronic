@@ -46,6 +46,13 @@ defmodule Chronic.Processors.Relative do
 
         { :ok, combine(parts) }
       end
+
+      # 6 in the morning
+      def process([number: hour, word: "in", word: "the", word: "morning"], [currently: currently]) do
+        {{year, month, day}, _} = currently
+
+        { :ok, combine(year: year, month: month, day: day, hour: hour, minute: 0, second: 0, usec: 0) }
+      end
     end
   end
 end

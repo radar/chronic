@@ -9,7 +9,7 @@ defmodule Chronic do
         { :ok, time, offset }
       _ ->
         currently = opts[:currently] || :calendar.universal_time
-        result = time |> preprocess |> process(currently: currently)
+        result = time |> preprocess |> debug(opts[:debug]) |> process(currently: currently)
         case result do
           { :ok, time } ->
             { :ok, time, 0 }
@@ -75,5 +75,13 @@ defmodule Chronic do
         Calendar.Date.day_of_week_zb(date) == day_of_the_week
       end)
     [year: year, month: month, day: day]
+  end
+
+  defp debug(result, debug) when debug == true do
+    IO.inspect(result)
+  end
+
+  defp debug(result, debug) do
+    result
   end
 end
