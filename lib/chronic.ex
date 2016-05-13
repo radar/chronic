@@ -81,7 +81,7 @@ defmodule Chronic do
     IO.inspect(result)
   end
 
-  defp debug(result, debug) do
+  defp debug(result, _debug) do
     result
   end
 end
