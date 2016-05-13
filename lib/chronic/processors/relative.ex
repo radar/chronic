@@ -11,10 +11,8 @@ defmodule Chronic.Processors.Relative do
         process_yesterday(currently, time)
       end
 
-      defp process_yesterday(currently, time) do
-        {{ _, month, day }, _} = currently
-
-        { :ok, datetime } = combine(currently, month: month, day: day, time: time)
+      defp process_yesterday({{year, month, day}, _}, time) do
+        { :ok, datetime } = combine([year: year, month: month, day: day] ++ time)
                             |> Calendar.NaiveDateTime.subtract(86400)
 
         { :ok, datetime }
@@ -30,11 +28,9 @@ defmodule Chronic.Processors.Relative do
         process_tomorrow(currently, time)
       end
 
-      def process_tomorrow(currently, time) do
+      def process_tomorrow({{year, month, day}, _}, time) do
         # Tomorrow at 9am
-        {{ _, month, day }, _} = currently
-
-        { :ok, datetime } = combine(currently, month: month, day: day, time: time)
+        { :ok, datetime } = combine([year: year, month: month, day: day] ++ time)
                             |> Calendar.NaiveDateTime.add(86400)
 
         { :ok, datetime }
@@ -55,9 +51,7 @@ defmodule Chronic.Processors.Relative do
       end
 
       # Tueesday
-      def process([day_of_the_week: day_of_the_week], [currently: currently]) do
-        {current_date, _} = currently
-
+      def process([day_of_the_week: day_of_the_week], [currently: { current_date, _}]) do
         parts = find_next_day_of_the_week(current_date, day_of_the_week) ++ [hour: 12, minute: 0, second: 0, usec: 0]
         { :ok, combine(parts) }
       end
@@ -79,16 +73,12 @@ defmodule Chronic.Processors.Relative do
       end
 
       # 6 in the morning
-      def process([number: hour, word: "in", word: "the", word: "morning"], [currently: currently]) do
-        {{year, month, day}, _} = currently
-
+      def process([number: hour, word: "in", word: "the", word: "morning"], [currently: {{year, month, day}, _}]) do
         { :ok, combine(year: year, month: month, day: day, hour: hour, minute: 0, second: 0, usec: 0) }
       end
 
       # 6 in the evening
-      def process([number: hour, word: "in", word: "the", word: "evening"], [currently: currently]) do
-        {{year, month, day}, _} = currently
-
+      def process([number: hour, word: "in", word: "the", word: "evening"], [currently: {{year, month, day}, _}]) do
         { :ok, combine(year: year, month: month, day: day, hour: hour + 12, minute: 0, second: 0, usec: 0) }
       end
 

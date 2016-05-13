@@ -27,20 +27,15 @@ defmodule Chronic do
     { :error, :unknown_format }
   end
 
-  defp combine(currently, month: month, day: day) do
-    {{ year, _, _ }, _} = currently
+  defp combine({{year, _, _}, _}, month: month, day: day) do
     combine(year: year, month: month, day: day, hour: 0, minute: 0, second: 0, usec: 0)
   end
 
-  defp combine(currently, month: month, day: day, time: time) do
-    {{ year, _, _ }, _} = currently
-
+  defp combine({{year, _, _}, _}, month: month, day: day, time: time) do
     combine([year: year, month: month, day: day] ++ time)
   end
 
-  defp combine(currently, time: time) do
-    {{year, month, day}, _} = currently
-
+  defp combine({{year, month, day}, _}, time: time) do
     combine([year: year, month: month, day: day] ++ time)
   end
 
@@ -57,14 +52,9 @@ defmodule Chronic do
     [year: year, month: month, day: day]
   end
 
-  def date_for(datetime) do
-    {date, _} = datetime
-    date
-  end
+  def date_for({date, _}), do: date
 
-  def date_with_time(date, time) do
-    { year, month, day } = date
-
+  def date_with_time({year, month, day}, time) do
     parts = [year: year, month: month, day: day] ++ time
 
     combine(parts)

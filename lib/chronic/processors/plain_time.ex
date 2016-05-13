@@ -10,18 +10,14 @@ defmodule Chronic.Processors.PlainTime do
       end
 
       # 10 to 8
-      def process([number: minutes, word: "to", number: hour], [currently: currently]) do
-        {{year, month, day}, _} = currently
-
+      def process([number: minutes, word: "to", number: hour], [currently: {{year, month, day}, _}]) do
         time = combine(year: year, month: month, day: day, hour: hour, minute: 0, second: 0, usec: 0)
 
         time |> Calendar.NaiveDateTime.subtract(minutes * 60)
       end
 
       # 10 to 8am
-      def process([number: minutes, word: "to", time: time], [currently: currently]) do
-        {{year, month, day}, _} = currently
-
+      def process([number: minutes, word: "to", time: time], [currently: {{year, month, day}, _}]) do
         ([year: year, month: month, day: day] ++ time)
           |> combine
           |> Calendar.NaiveDateTime.subtract(minutes * 60)
@@ -29,9 +25,7 @@ defmodule Chronic.Processors.PlainTime do
 
       # half past 2
       # half past 2pm
-      def process([word: "half", word: "past", number: hour], [currently: currently]) do
-        {{year, month, day}, _} = currently
-
+      def process([word: "half", word: "past", number: hour], [currently: {{year, month, day}, _}]) do
         combine(year: year, month: month, day: day, hour: hour, minute: 0, second: 0, usec: 0)
           |> Calendar.NaiveDateTime.add(30 * 60)
       end
