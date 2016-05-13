@@ -1,7 +1,7 @@
 defmodule Chronic do
   use Chronic.Processors.MonthAndDay
   use Chronic.Processors.Relative
-  use Chronic.Processors.Time
+  use Chronic.Processors.PlainTime
 
   def parse(time, opts \\ []) do
     case Calendar.NaiveDateTime.Parse.iso8601(time) do

@@ -1,4 +1,4 @@
-defmodule Chronic.Processors.Time do
+defmodule Chronic.Processors.PlainTime do
   defmacro __using__(_) do
     quote do
       # 9am
