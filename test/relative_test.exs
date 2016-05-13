@@ -67,4 +67,10 @@ defmodule Chronic.RelativeTest do
     assert time == %Calendar.NaiveDateTime{year: 2015, month: 5, day: 9, hour: 18, min: 0, sec: 0, usec: 0}
     assert offset == 0
   end
+
+  test "sat 7 in the evening" do
+    { :ok, time, offset } = Chronic.parse("sat 7 in the evening", currently: frozen_time)
+    assert time == %Calendar.NaiveDateTime{year: 2015, month: 5, day: 16, hour: 19, min: 0, sec: 0, usec: 0}
+    assert offset == 0
+  end
 end
