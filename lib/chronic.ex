@@ -1,4 +1,14 @@
 defmodule Chronic do
+  def parse(time, opts \\ []) do
+    case Calendar.NaiveDateTime.Parse.iso8601(time) do
+      { :ok, time, offset } ->
+        { :ok, time, offset }
+      _ ->
+        currently = opts[:currently] || :calendar.universal_time
+        { :ok, time |> preprocess |> scan(currently: currently), 0 }
+    end
+  end
+
   def scan([month: month, number: day], [currently: currently]) do
     combine(currently, month: month, day: day)
   end
@@ -32,23 +42,25 @@ defmodule Chronic do
   def scan([day_of_the_week: day_of_the_week], [currently: currently]) do
     {current_date, _} = currently
 
-    %{ year: year, month: month, day: day } = Calendar.Date.days_after(current_date) 
-      |> Enum.take(7)
-      |> Enum.find(fn(date) ->
-        Calendar.Date.day_of_week_zb(date) == day_of_the_week
-      end)
+    %{ year: year, month: month, day: day } = find_next_day_of_the_week(current_date, day_of_the_week)
 
     {{ year, month, day}, { 12, 0, 0}} |> Calendar.NaiveDateTime.from_erl!(0)
   end
 
-  def parse(time, opts \\ []) do
-    case Calendar.NaiveDateTime.Parse.iso8601(time) do
-      { :ok, time, offset } ->
-        { :ok, time, offset }
-      _ ->
-        currently = opts[:currently] || :calendar.universal_time
-        { :ok, time |> preprocess |> scan(currently: currently), 0 }
-    end
+  def scan([day_of_the_week: day_of_the_week, time: time], [currently: currently]) do
+    {current_date, _} = currently
+
+    %{ year: year, month: month, day: day } = find_next_day_of_the_week(current_date, day_of_the_week)
+
+    combine(year: year, month: month, day: day, time: time)
+  end
+
+  def scan([{:day_of_the_week, day_of_the_week}, "at", {:time, time}], [currently: currently]) do
+    {current_date, _} = currently
+
+    %{ year: year, month: month, day: day } = find_next_day_of_the_week(current_date, day_of_the_week)
+
+    combine(year: year, month: month, day: day, time: time)
   end
 
   defp preprocess(time) do
@@ -57,7 +69,7 @@ defmodule Chronic do
 
   defp combine(currently, month: month, day: day) do
     {{ year, _, _ }, _} = currently
-    {{ year, month, process_day(day) }, { 0, 0, 0 }} |> Calendar.NaiveDateTime.from_erl!
+    {{ year, month, day }, { 0, 0, 0 }} |> Calendar.NaiveDateTime.from_erl!
   end
 
   defp combine(currently, month: month, day: day, time: time) do
@@ -65,15 +77,13 @@ defmodule Chronic do
 
     [hour: hour, minute: minute, second: second, usec: usec] = parse_time(time)
     
-    {{ year, month, process_day(day) }, { hour, minute, second }} |> Calendar.NaiveDateTime.from_erl!(usec)
+    {{ year, month, day }, { hour, minute, second }} |> Calendar.NaiveDateTime.from_erl!(usec)
   end
 
-  defp process_day(day) when is_integer(day) do
-    day
-  end
-
-  defp process_day(day) do
-    Regex.replace(~r/st|nd|rd|th/, day, "") |> String.to_integer
+  defp combine(year: year, month: month, day: day, time: time) do
+    [hour: hour, minute: minute, second: second, usec: usec] = parse_time(time)
+    
+    {{ year, month, day }, { hour, minute, second }} |> Calendar.NaiveDateTime.from_erl!(usec)
   end
 
   defp parse_time([hour: hour, minute: minute, second: second, usec: usec, am_or_pm: am_or_pm]) do
@@ -84,5 +94,13 @@ defmodule Chronic do
     usec = if usec == "", do: 0, else: String.to_integer(usec)
 
     [hour: hour, minute: minute, second: second, usec: usec]
+  end
+
+  defp find_next_day_of_the_week(current_date, day_of_the_week) do
+    Calendar.Date.days_after(current_date) 
+      |> Enum.take(7)
+      |> Enum.find(fn(date) ->
+        Calendar.Date.day_of_week_zb(date) == day_of_the_week
+      end)
   end
 end

@@ -38,9 +38,9 @@ defmodule Chronic.Tokenizer do
         {:day_of_the_week, day_of_the_week_number(token)}
       Regex.match?(ordinal_regex, token) ->
         %{"number" => number} = Regex.named_captures(ordinal_regex, token)
-        {:number, number}
+        {:number, String.to_integer(number)}
       Regex.match?(~r/\A\d+\Z/, token) ->
-        {:number, token}
+        {:number, String.to_integer(token)}
       Regex.match?(time_regex, token) ->
         %{
           "hour" => hour,
