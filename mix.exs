@@ -4,7 +4,7 @@ defmodule Chronic.Mixfile do
   def project do
     [app: :chronic,
      version: "0.0.1",
-     elixir: "~> 1.2.3",
+     elixir: "~> 1.0",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      escript: [main_module: Chronic.CLI],
