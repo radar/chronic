@@ -26,6 +26,15 @@ defmodule Chronic.Processors.PlainTime do
           |> combine
           |> Calendar.NaiveDateTime.subtract(minutes * 60)
       end
+
+      # half past 2
+      # half past 2pm
+      def process(["half", "past", {:number, hour}], [currently: currently]) do
+        {{year, month, day}, _} = currently
+
+        combine(year: year, month: month, day: day, hour: hour, minute: 0, second: 0, usec: 0)
+          |> Calendar.NaiveDateTime.add(30 * 60)
+      end
     end
   end
 end
