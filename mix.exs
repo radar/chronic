@@ -7,6 +7,7 @@ defmodule Chronic.Mixfile do
      elixir: "~> 1.2.3",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
+     escript: [main_module: Chronic.CLI],
      deps: deps]
   end
 
@@ -27,6 +28,9 @@ defmodule Chronic.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   defp deps do
-    [{:calendar, "~> 0.14.0"}]
+    [
+      {:calendar, "~> 0.14.0"},
+      {:tzdata, "~> 0.1.8", override: true}
+   ]
   end
 end

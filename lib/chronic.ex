@@ -5,7 +5,8 @@ defmodule Chronic do
         { :ok, time, offset }
       _ ->
         currently = opts[:currently] || :calendar.universal_time
-        { :ok, time |> preprocess |> scan(currently: currently), 0 }
+        time = time |> preprocess |> scan(currently: currently)
+        { :ok, time, 0 }
     end
   end
 
@@ -61,6 +62,10 @@ defmodule Chronic do
     %{ year: year, month: month, day: day } = find_next_day_of_the_week(current_date, day_of_the_week)
 
     combine(year: year, month: month, day: day, time: time)
+  end
+
+  def scan(_, _opts) do
+    nil
   end
 
   defp preprocess(time) do

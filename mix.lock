@@ -5,4 +5,4 @@
   "metrics": {:hex, :metrics, "1.0.1"},
   "mimerl": {:hex, :mimerl, "1.0.2"},
   "ssl_verify_fun": {:hex, :ssl_verify_fun, "1.1.0"},
-  "tzdata": {:hex, :tzdata, "0.5.7"}}
+  "tzdata": {:hex, :tzdata, "0.1.201603"}}

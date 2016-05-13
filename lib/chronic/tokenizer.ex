@@ -47,7 +47,7 @@ defmodule Chronic.Tokenizer do
         } = Regex.named_captures(time_regex, token)
         { :time, hour: hour, minute: minute, second: second, usec: usec, am_or_pm: am_or_pm }
       true ->
-        raise "Unrecognised token #{token}"
+        nil
     end
   end
 
