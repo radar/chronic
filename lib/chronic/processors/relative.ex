@@ -25,27 +25,26 @@ defmodule Chronic.Processors.Relative do
       def process([day_of_the_week: day_of_the_week], [currently: currently]) do
         {current_date, _} = currently
 
-        %{ year: year, month: month, day: day } = find_next_day_of_the_week(current_date, day_of_the_week)
-
-        { :ok, {{ year, month, day}, { 12, 0, 0}} |> Calendar.NaiveDateTime.from_erl!(0) }
+        parts = find_next_day_of_the_week(current_date, day_of_the_week) ++ [hour: 12, minute: 0, second: 0, usec: 0]
+        { :ok, combine(parts) }
       end
 
       # Tuesday 9am
       def process([day_of_the_week: day_of_the_week, time: time], [currently: currently]) do
         {current_date, _} = currently
 
-        %{ year: year, month: month, day: day } = find_next_day_of_the_week(current_date, day_of_the_week)
+        parts = find_next_day_of_the_week(current_date, day_of_the_week) ++ parse_time(time)
 
-        { :ok, combine(year: year, month: month, day: day, time: time) }
+        { :ok, combine(parts) }
       end
 
       # Tuesday at 9am
       def process([{:day_of_the_week, day_of_the_week}, "at", {:time, time}], [currently: currently]) do
         {current_date, _} = currently
 
-        %{ year: year, month: month, day: day } = find_next_day_of_the_week(current_date, day_of_the_week)
+        parts = find_next_day_of_the_week(current_date, day_of_the_week) ++ parse_time(time)
 
-        { :ok,  combine(year: year, month: month, day: day, time: time) }
+        { :ok, combine(parts) }
       end
     end
   end

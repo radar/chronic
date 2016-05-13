@@ -5,33 +5,33 @@ defmodule Chronic.MonthAndDayTest do
   test "month and day" do
     { :ok, time, offset } = Chronic.parse("aug 3")
 
-    assert time == %Calendar.NaiveDateTime{year: current_year, month: 8, day: 3, hour: 0, min: 0, sec: 0, usec: nil}
+    assert time == %Calendar.NaiveDateTime{year: current_year, month: 8, day: 3, hour: 0, min: 0, sec: 0, usec: 0}
     assert offset == 0
   end
 
   test "capitalised month and day" do
     { :ok, time, offset } = Chronic.parse("AUG 3")
 
-    assert time == %Calendar.NaiveDateTime{year: current_year, month: 8, day: 3, hour: 0, min: 0, sec: 0, usec: nil}
+    assert time == %Calendar.NaiveDateTime{year: current_year, month: 8, day: 3, hour: 0, min: 0, sec: 0, usec: 0}
     assert offset == 0
   end
 
   test "month and ordinalized day" do
     { :ok, time, offset } = Chronic.parse("aug 3rd")
 
-    assert time == %Calendar.NaiveDateTime{year: current_year, month: 8, day: 3, hour: 0, min: 0, sec: 0, usec: nil}
+    assert time == %Calendar.NaiveDateTime{year: current_year, month: 8, day: 3, hour: 0, min: 0, sec: 0, usec: 0}
     assert offset == 0
   end
 
   test "month with dot and date (aug. 3)" do
     { :ok, time, offset } = Chronic.parse("aug. 3")
-    assert time == %Calendar.NaiveDateTime{year: current_year, month: 8, day: 3, hour: 0, min: 0, sec: 0, usec: nil}
+    assert time == %Calendar.NaiveDateTime{year: current_year, month: 8, day: 3, hour: 0, min: 0, sec: 0, usec: 0}
     assert offset == 0
   end
 
   test "month and day with dash" do
     { :ok, time, offset } = Chronic.parse("aug-20")
-    assert time == %Calendar.NaiveDateTime{year: current_year, month: 8, day: 20, hour: 0, min: 0, sec: 0, usec: nil}
+    assert time == %Calendar.NaiveDateTime{year: current_year, month: 8, day: 20, hour: 0, min: 0, sec: 0, usec: 0}
     assert offset == 0
   end
 

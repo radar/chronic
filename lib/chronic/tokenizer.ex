@@ -22,6 +22,10 @@ defmodule Chronic.Tokenizer do
     "tomorrow"
   end
 
+  def tokenize("to") do
+    "to"
+  end
+
   def tokenize(token) do
     token = String.downcase(token)
     ordinal_regex = ~r/\A(?<number>\d+)(st|nd|rd|th)\Z/
