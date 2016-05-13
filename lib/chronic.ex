@@ -45,12 +45,12 @@ defmodule Chronic do
   end
 
   defp combine(currently, month: month, day: day) do
-    {{ year, _, _ }, { _, _, _}} = currently
+    {{ year, _, _ }, _} = currently
     {{ year, month, process_day(day) }, { 0, 0, 0 }} |> Calendar.NaiveDateTime.from_erl!
   end
 
   defp combine(currently, month: month, day: day, time: time) do
-    {{ year, _, _ }, { _, _, _}} = currently
+    {{ year, _, _ }, _} = currently
 
     [hour: hour, minute: minute, second: second, usec: usec] = parse_time(time)
     
