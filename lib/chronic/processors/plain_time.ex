@@ -10,7 +10,7 @@ defmodule Chronic.Processors.PlainTime do
       end
 
       # 10 to 8
-      def process([{:number, minutes}, "to", {:number, hour}], [currently: currently]) do
+      def process([number: minutes, word: "to", number: hour], [currently: currently]) do
         {{year, month, day}, _} = currently
 
         time = combine(year: year, month: month, day: day, hour: hour, minute: 0, second: 0, usec: 0)
@@ -19,7 +19,7 @@ defmodule Chronic.Processors.PlainTime do
       end
 
       # 10 to 8am
-      def process([{:number, minutes}, "to", {:time, time}], [currently: currently]) do
+      def process([number: minutes, word: "to", time: time], [currently: currently]) do
         {{year, month, day}, _} = currently
 
         ([year: year, month: month, day: day] ++ parse_time(time)) 
@@ -29,7 +29,7 @@ defmodule Chronic.Processors.PlainTime do
 
       # half past 2
       # half past 2pm
-      def process(["half", "past", {:number, hour}], [currently: currently]) do
+      def process([word: "half", word: "past", number: hour], [currently: currently]) do
         {{year, month, day}, _} = currently
 
         combine(year: year, month: month, day: day, hour: hour, minute: 0, second: 0, usec: 0)

@@ -2,7 +2,7 @@ defmodule Chronic.Processors.Relative do
   defmacro __using__(_) do
     quote do
       # Yesterday at 9am
-      def process(["yesterday", "at", { :time, time }], [currently: currently]) do
+      def process([word: "yesterday", word: "at", time: time], [currently: currently]) do
         {{ _, month, day }, _} = currently
 
         { :ok, datetime } = combine(currently, month: month, day: day, time: time)
@@ -12,7 +12,7 @@ defmodule Chronic.Processors.Relative do
       end
 
       # Tomorrow at 9am
-      def process(["tomorrow", "at", { :time, time }], [currently: currently]) do
+      def process([word: "tomorrow", word: "at", time: time], [currently: currently]) do
         {{ _, month, day }, _} = currently
 
         { :ok, datetime } = combine(currently, month: month, day: day, time: time)
@@ -39,7 +39,7 @@ defmodule Chronic.Processors.Relative do
       end
 
       # Tuesday at 9am
-      def process([{:day_of_the_week, day_of_the_week}, "at", {:time, time}], [currently: currently]) do
+      def process([day_of_the_week: day_of_the_week, word: "at", time: time], [currently: currently]) do
         {current_date, _} = currently
 
         parts = find_next_day_of_the_week(current_date, day_of_the_week) ++ parse_time(time)

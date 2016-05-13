@@ -10,29 +10,29 @@ defmodule Chronic.Tokenizer do
     []
   end
 
-  def tokenize("at") do
-    "at"
-  end
+  # def tokenize("at") do
+  #   "at"
+  # end
 
-  def tokenize("yesterday") do
-    "yesterday"
-  end
+  # def tokenize("yesterday") do
+  #   "yesterday"
+  # end
 
-  def tokenize("tomorrow") do
-    "tomorrow"
-  end
+  # def tokenize("tomorrow") do
+  #   "tomorrow"
+  # end
 
-  def tokenize("to") do
-    "to"
-  end
+  # def tokenize("to") do
+  #   "to"
+  # end
 
-  def tokenize("half") do
-    "half"
-  end
+  # def tokenize("half") do
+  #   "half"
+  # end
 
-  def tokenize("past") do
-    "past"
-  end
+  # def tokenize("past") do
+  #   "past"
+  # end
 
   def tokenize(token) do
     token = String.downcase(token)
@@ -58,6 +58,8 @@ defmodule Chronic.Tokenizer do
           "am_or_pm" => am_or_pm 
         } = Regex.named_captures(time_regex, token)
         { :time, hour: hour, minute: minute, second: second, usec: usec, am_or_pm: am_or_pm }
+      Regex.match?(~r/\A\w+\Z/, token) ->
+        {:word, token }
       true ->
         nil
     end

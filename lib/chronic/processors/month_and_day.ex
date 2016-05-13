@@ -12,7 +12,7 @@ defmodule Chronic.Processors.MonthAndDay do
       end
 
       # Aug 2 at 9am
-      def process([{:month, month}, {:number, day}, "at", {:time, time}], [currently: currently]) do
+      def process([month: month, number: day, word: "at", time: time], [currently: currently]) do
         { :ok, combine(currently, month: month, day: day, time: time) }
       end
     end
