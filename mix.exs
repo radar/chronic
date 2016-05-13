@@ -24,6 +24,7 @@ defmodule Chronic.Mixfile do
   defp package do
     [
       name: :chronic,
+      description: "Natural language datetime parser.",
       files: ["lib", "README*"],
       maintainers: ["Ryan Bigg"],
       licenses: ["MIT"],
