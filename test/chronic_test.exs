@@ -90,5 +90,6 @@ defmodule ChronicTest do
   test "month with day, with 'at' AM time with seconds and microseconds" do
     { :ok, time, offset } = Chronic.parse("may 28 at 5:32:19.764")
     assert time == %Calendar.NaiveDateTime{year: current_year, month: 5, day: 28, hour: 5, min: 32, sec: 19, usec: 764}
+    assert offset == 0
   end
 end
