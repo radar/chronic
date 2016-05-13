@@ -3,34 +3,31 @@ defmodule Chronic.Mixfile do
 
   def project do
     [app: :chronic,
-     version: "0.0.1",
-     elixir: "~> 1.0",
+     version: "1.0.0",
+     elixir: "~> 1.2",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
-     escript: [main_module: Chronic.CLI],
+     package: package,
      deps: deps]
   end
 
-  # Configuration for the OTP application
-  #
-  # Type "mix help compile.app" for more information
   def application do
     [applications: [:logger, :calendar]]
   end
 
-  # Dependencies can be Hex packages:
-  #
-  #   {:mydep, "~> 0.3.0"}
-  #
-  # Or git/path repositories:
-  #
-  #   {:mydep, git: "https://github.com/elixir-lang/mydep.git", tag: "0.1.0"}
-  #
-  # Type "mix help deps" for more examples and options
   defp deps do
     [
-      {:calendar, "~> 0.14.0"},
-      {:tzdata, "~> 0.1.8", override: true}
+      {:calendar, "~> 0.14.0"}
    ]
+  end
+
+  defp package do
+    [
+      name: :chronic,
+      files: ["lib", "README*"],
+      maintainers: ["Ryan Bigg"],
+      licenses: ["MIT"],
+      links: %{"GitHub" => "https://github.com/radar/chronic"}
+    ]
   end
 end
