@@ -1,71 +1,17 @@
 defmodule Chronic do
+  use Chronic.Processors.MonthAndDay
+  use Chronic.Processors.Relative
+  use Chronic.Processors.Time
+
   def parse(time, opts \\ []) do
     case Calendar.NaiveDateTime.Parse.iso8601(time) do
       { :ok, time, offset } ->
         { :ok, time, offset }
       _ ->
         currently = opts[:currently] || :calendar.universal_time
-        time = time |> preprocess |> scan(currently: currently)
+        time = time |> preprocess |> process(currently: currently)
         { :ok, time, 0 }
     end
-  end
-
-  def scan([month: month, number: day], [currently: currently]) do
-    combine(currently, month: month, day: day)
-  end
-
-  def scan([month: month, number: day, time: time], [currently: currently]) do
-    combine(currently, month: month, day: day, time: time)
-  end
-
-  def scan([{:month, month}, {:number, day}, "at", {:time, time}], [currently: currently]) do
-    combine(currently, month: month, day: day, time: time)
-  end
-
-  def scan(["yesterday", "at", { :time, time }], [currently: currently]) do
-    {{ _, month, day }, _} = currently
-
-    { :ok, datetime } = combine(currently, month: month, day: day, time: time)
-                        |> Calendar.NaiveDateTime.subtract(86400)
-
-    datetime
-  end
-
-  def scan(["tomorrow", "at", { :time, time }], [currently: currently]) do
-    {{ _, month, day }, _} = currently
-
-    { :ok, datetime } = combine(currently, month: month, day: day, time: time)
-                        |> Calendar.NaiveDateTime.add(86400)
-
-    datetime
-  end
-
-  def scan([time: time], [currently: currently]) do
-    combine(currently, time: time)
-  end
-
-  def scan([day_of_the_week: day_of_the_week], [currently: currently]) do
-    {current_date, _} = currently
-
-    %{ year: year, month: month, day: day } = find_next_day_of_the_week(current_date, day_of_the_week)
-
-    {{ year, month, day}, { 12, 0, 0}} |> Calendar.NaiveDateTime.from_erl!(0)
-  end
-
-  def scan([day_of_the_week: day_of_the_week, time: time], [currently: currently]) do
-    {current_date, _} = currently
-
-    %{ year: year, month: month, day: day } = find_next_day_of_the_week(current_date, day_of_the_week)
-
-    combine(year: year, month: month, day: day, time: time)
-  end
-
-  def scan([{:day_of_the_week, day_of_the_week}, "at", {:time, time}], [currently: currently]) do
-    {current_date, _} = currently
-
-    %{ year: year, month: month, day: day } = find_next_day_of_the_week(current_date, day_of_the_week)
-
-    combine(year: year, month: month, day: day, time: time)
   end
 
   def scan(_, _opts) do
