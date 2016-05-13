@@ -42,11 +42,15 @@ defmodule Chronic.Processors.Relative do
 
       # Today 9am
       def process([word: "today", time: time], [currently: currently]) do
-        { :ok, date_for(currently) |> date_with_time(time) }
+        process_today(currently, time)
       end
 
       # Today at 9am
       def process([word: "today", word: "at", time: time], [currently: currently]) do
+        process_today(currently, time)
+      end
+
+      defp process_today(currently, time) do
         { :ok, date_for(currently) |> date_with_time(time) }
       end
 
