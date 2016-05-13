@@ -77,6 +77,19 @@ defmodule Chronic do
     [year: year, month: month, day: day]
   end
 
+  def date_for(datetime) do
+    {date, _} = datetime
+    date
+  end
+
+  def date_with_time(date, time) do
+    { year, month, day } = date
+
+    parts = [year: year, month: month, day: day] ++ parse_time(time)
+
+    combine(parts)
+  end
+
   defp debug(result, debug) when debug == true do
     IO.inspect(result)
   end

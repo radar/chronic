@@ -14,6 +14,18 @@ defmodule Chronic.RelativeTest do
     assert offset == 0
   end
 
+  test "today 10am" do
+    { :ok, time, offset } = Chronic.parse("today 10am", currently: frozen_time)
+    assert time == %Calendar.NaiveDateTime{year: 2015, month: 5, day: 9, hour: 10, min: 0, sec: 0, usec: 0}
+    assert offset == 0
+  end
+
+  test "today at 10am" do
+    { :ok, time, offset } = Chronic.parse("today at 10am", currently: frozen_time)
+    assert time == %Calendar.NaiveDateTime{year: 2015, month: 5, day: 9, hour: 10, min: 0, sec: 0, usec: 0}
+    assert offset == 0
+  end
+
   test "tuesday" do
     { :ok, time, offset } = Chronic.parse("tuesday", currently: frozen_time)
     assert time == %Calendar.NaiveDateTime{year: 2015, month: 5, day: 12, hour: 12, min: 0, sec: 0, usec: 0}

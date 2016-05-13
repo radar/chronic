@@ -21,6 +21,26 @@ defmodule Chronic.Processors.Relative do
         { :ok, datetime }
       end
 
+      # Today 9am
+      def process([word: "tomorrow", word: "at", time: time], [currently: currently]) do
+        {{ _, month, day }, _} = currently
+
+        { :ok, datetime } = combine(currently, month: month, day: day, time: time)
+                            |> Calendar.NaiveDateTime.add(86400)
+
+        { :ok, datetime }
+      end
+
+      # Today 9am
+      def process([word: "today", time: time], [currently: currently]) do
+        { :ok, date_for(currently) |> date_with_time(time) }
+      end
+
+      # Today at 9am
+      def process([word: "today", word: "at", time: time], [currently: currently]) do
+        { :ok, date_for(currently) |> date_with_time(time) }
+      end
+
       # Tueesday
       def process([day_of_the_week: day_of_the_week], [currently: currently]) do
         {current_date, _} = currently
