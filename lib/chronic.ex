@@ -40,6 +40,10 @@ defmodule Chronic do
     datetime
   end
 
+  def scan([time: time], [currently: currently]) do
+    combine(currently, time: time)
+  end
+
   def scan([day_of_the_week: day_of_the_week], [currently: currently]) do
     {current_date, _} = currently
 
@@ -82,6 +86,13 @@ defmodule Chronic do
 
     [hour: hour, minute: minute, second: second, usec: usec] = parse_time(time)
     
+    {{ year, month, day }, { hour, minute, second }} |> Calendar.NaiveDateTime.from_erl!(usec)
+  end
+
+  defp combine(currently, time: time) do
+    {{year, month, day}, _} = currently
+    [hour: hour, minute: minute, second: second, usec: usec] = parse_time(time)
+
     {{ year, month, day }, { hour, minute, second }} |> Calendar.NaiveDateTime.from_erl!(usec)
   end
 
