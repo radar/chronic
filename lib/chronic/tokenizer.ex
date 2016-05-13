@@ -23,6 +23,7 @@ defmodule Chronic.Tokenizer do
 
   def tokenize(token) do
     month_matcher = fn (month) ->
+      token = String.downcase(token)
       month == token || "#{month}." == token
     end
 

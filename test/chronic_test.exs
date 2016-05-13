@@ -44,6 +44,13 @@ defmodule ChronicTest do
     assert offset == 0
   end
 
+  test "capitalised month and day" do
+    { :ok, time, offset } = Chronic.parse("AUG 3")
+
+    assert time == %Calendar.NaiveDateTime{year: current_year, month: 8, day: 3, hour: 0, min: 0, sec: 0, usec: nil}
+    assert offset == 0
+  end
+
   test "month and ordinalized day" do
     { :ok, time, offset } = Chronic.parse("aug 3rd")
 
