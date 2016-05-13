@@ -29,6 +29,18 @@ defmodule Chronic do
     datetime
   end
 
+  def scan([day_of_the_week: day_of_the_week], [currently: currently]) do
+    {current_date, _} = currently
+
+    %{ year: year, month: month, day: day } = Calendar.Date.days_after(current_date) 
+      |> Enum.take(7)
+      |> Enum.find(fn(date) ->
+        Calendar.Date.day_of_week_zb(date) == day_of_the_week
+      end)
+
+    {{ year, month, day}, { 12, 0, 0}} |> Calendar.NaiveDateTime.from_erl!(0)
+  end
+
   def parse(time, opts \\ []) do
     case Calendar.NaiveDateTime.Parse.iso8601(time) do
       { :ok, time, offset } ->
