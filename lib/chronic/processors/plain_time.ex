@@ -6,7 +6,7 @@ defmodule Chronic.Processors.PlainTime do
       # 9:30:15am
       # 9:30:15.123456am
       def process([time: time], [currently: currently]) do
-        combine(currently, time: time)
+        { :ok, combine(currently, time: time) }
       end
     end
   end

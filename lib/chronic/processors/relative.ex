@@ -8,7 +8,7 @@ defmodule Chronic.Processors.Relative do
         { :ok, datetime } = combine(currently, month: month, day: day, time: time)
                             |> Calendar.NaiveDateTime.subtract(86400)
 
-        datetime
+        { :ok, datetime }
       end
 
       # Tomorrow at 9am
@@ -18,7 +18,7 @@ defmodule Chronic.Processors.Relative do
         { :ok, datetime } = combine(currently, month: month, day: day, time: time)
                             |> Calendar.NaiveDateTime.add(86400)
 
-        datetime
+        { :ok, datetime }
       end
 
       # Tueesday
@@ -27,7 +27,7 @@ defmodule Chronic.Processors.Relative do
 
         %{ year: year, month: month, day: day } = find_next_day_of_the_week(current_date, day_of_the_week)
 
-        {{ year, month, day}, { 12, 0, 0}} |> Calendar.NaiveDateTime.from_erl!(0)
+        { :ok, {{ year, month, day}, { 12, 0, 0}} |> Calendar.NaiveDateTime.from_erl!(0) }
       end
 
       # Tuesday 9am
@@ -36,7 +36,7 @@ defmodule Chronic.Processors.Relative do
 
         %{ year: year, month: month, day: day } = find_next_day_of_the_week(current_date, day_of_the_week)
 
-        combine(year: year, month: month, day: day, time: time)
+        { :ok, combine(year: year, month: month, day: day, time: time) }
       end
 
       # Tuesday at 9am
@@ -45,7 +45,7 @@ defmodule Chronic.Processors.Relative do
 
         %{ year: year, month: month, day: day } = find_next_day_of_the_week(current_date, day_of_the_week)
 
-        combine(year: year, month: month, day: day, time: time)
+        { :ok,  combine(year: year, month: month, day: day, time: time) }
       end
     end
   end

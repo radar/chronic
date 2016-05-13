@@ -9,17 +9,22 @@ defmodule Chronic do
         { :ok, time, offset }
       _ ->
         currently = opts[:currently] || :calendar.universal_time
-        time = time |> preprocess |> process(currently: currently)
-        { :ok, time, 0 }
+        result = time |> preprocess |> process(currently: currently)
+        case result do
+          { :ok, time } ->
+            { :ok, time, 0 }
+          error ->
+            error
+        end
     end
-  end
-
-  def scan(_, _opts) do
-    nil
   end
 
   defp preprocess(time) do
     String.replace(time, "-", " ") |> String.split(" ") |> Chronic.Tokenizer.tokenize
+  end
+
+  def process(_, _opts) do
+    { :error, :unknown_format }
   end
 
   defp combine(currently, month: month, day: day) do
