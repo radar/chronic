@@ -1,5 +1,5 @@
 defmodule ChronicTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
   doctest Chronic
 
   def current_year do
