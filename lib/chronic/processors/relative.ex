@@ -64,20 +64,18 @@ defmodule Chronic.Processors.Relative do
 
       # Tuesday 9am
       def process([day_of_the_week: day_of_the_week, time: time], [currently: currently]) do
-        {current_date, _} = currently
-
-        parts = find_next_day_of_the_week(current_date, day_of_the_week) ++ parse_time(time)
-
-        { :ok, combine(parts) }
+        process_day_of_the_week_with_time(currently, day_of_the_week, time)
       end
 
       # Tuesday at 9am
       def process([day_of_the_week: day_of_the_week, word: "at", time: time], [currently: currently]) do
-        {current_date, _} = currently
+        process_day_of_the_week_with_time(currently, day_of_the_week, time)
+      end
 
-        parts = find_next_day_of_the_week(current_date, day_of_the_week) ++ parse_time(time)
+      defp process_day_of_the_week_with_time(currently, day_of_the_week, time) do
+        parts = (date_for(currently) |> find_next_day_of_the_week(day_of_the_week))
 
-        { :ok, combine(parts) }
+        { :ok, combine(parts ++ parse_time(time)) }
       end
 
       # 6 in the morning
