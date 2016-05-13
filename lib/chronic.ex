@@ -1,5 +1,4 @@
 defmodule Chronic do
-  # "aug 3"
   def scan([month: month, number: day], [currently: currently]) do
     combine(currently, month: month, day: day)
   end
