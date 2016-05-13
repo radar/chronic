@@ -26,14 +26,7 @@ defmodule Chronic.Tokenizer do
       Regex.match?(~r/\A\d+\Z/, token) ->
         {:number, String.to_integer(token)}
       Regex.match?(time_regex, token) ->
-        %{
-          "hour" => hour,
-          "minute" => minute,
-          "second" => second,
-          "usec" => usec,
-          "am_or_pm" => am_or_pm 
-        } = Regex.named_captures(time_regex, token)
-        { :time, hour: hour, minute: minute, second: second, usec: usec, am_or_pm: am_or_pm }
+        process_time(time_regex, token)
       Regex.match?(~r/\A\w+\Z/, token) ->
         {:word, token }
       true ->
@@ -55,5 +48,22 @@ defmodule Chronic.Tokenizer do
 
   defp day_of_the_week_number(token) do
     Enum.find_index(@day_names, fn (day_of_the_week) -> matches_day_of_the_week?(token, day_of_the_week) end)
+  end
+
+  defp process_time(time_regex, token) do
+    %{
+      "hour" => hour,
+      "minute" => minute,
+      "second" => second,
+      "usec" => usec,
+      "am_or_pm" => am_or_pm 
+    } = Regex.named_captures(time_regex, token)
+    hour = String.to_integer(hour)
+    hour = if am_or_pm == "pm", do: hour + 12, else: hour
+    minute = if minute == "", do: 0, else: String.to_integer(minute)
+    second = if second == "", do: 0, else: String.to_integer(second)
+    usec = if usec == "", do: 0, else: String.to_integer(usec)
+
+    { :time, [hour: hour, minute: minute, second: second, usec: usec] }
   end
 end

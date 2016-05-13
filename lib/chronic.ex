@@ -35,37 +35,17 @@ defmodule Chronic do
   defp combine(currently, month: month, day: day, time: time) do
     {{ year, _, _ }, _} = currently
 
-    [hour: hour, minute: minute, second: second, usec: usec] = parse_time(time)
-
-    combine(year: year, month: month, day: day, hour: hour, minute: minute, second: second, usec: usec)
+    combine([year: year, month: month, day: day] ++ time)
   end
 
   defp combine(currently, time: time) do
     {{year, month, day}, _} = currently
-    [hour: hour, minute: minute, second: second, usec: usec] = parse_time(time)
 
-    combine(year: year, month: month, day: day, hour: hour, minute: minute, second: second, usec: usec)
+    combine([year: year, month: month, day: day] ++ time)
   end
 
   defp combine(year: year, month: month, day: day, hour: hour, minute: minute, second: second, usec: usec) do
     {{ year, month, day }, { hour, minute, second }} |> Calendar.NaiveDateTime.from_erl!(usec)
-  end
-
-  defp parse_time([hour: hour, minute: minute, second: second, usec: usec, am_or_pm: am_or_pm]) do
-    [hour: hour, minute: minute, second: second] = parse_time(hour: hour, minute: minute, second: second)
-
-    hour = if am_or_pm == "pm", do: hour + 12, else: hour
-    usec = if usec == "", do: 0, else: String.to_integer(usec)
-
-    [hour: hour, minute: minute, second: second, usec: usec]
-  end
-
-  defp parse_time([hour: hour, minute: minute, second: second]) do
-    hour = String.to_integer(hour)
-    minute = if minute == "", do: 0, else: String.to_integer(minute)
-    second = if second == "", do: 0, else: String.to_integer(second)
-
-    [hour: hour, minute: minute, second: second]
   end
 
   defp find_next_day_of_the_week(current_date, day_of_the_week) do
@@ -85,7 +65,7 @@ defmodule Chronic do
   def date_with_time(date, time) do
     { year, month, day } = date
 
-    parts = [year: year, month: month, day: day] ++ parse_time(time)
+    parts = [year: year, month: month, day: day] ++ time
 
     combine(parts)
   end

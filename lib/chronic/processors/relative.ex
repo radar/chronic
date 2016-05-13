@@ -75,7 +75,7 @@ defmodule Chronic.Processors.Relative do
       defp process_day_of_the_week_with_time(currently, day_of_the_week, time) do
         parts = (date_for(currently) |> find_next_day_of_the_week(day_of_the_week))
 
-        { :ok, combine(parts ++ parse_time(time)) }
+        { :ok, combine(parts ++ time) }
       end
 
       # 6 in the morning

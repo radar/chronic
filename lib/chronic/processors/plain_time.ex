@@ -22,7 +22,7 @@ defmodule Chronic.Processors.PlainTime do
       def process([number: minutes, word: "to", time: time], [currently: currently]) do
         {{year, month, day}, _} = currently
 
-        ([year: year, month: month, day: day] ++ parse_time(time)) 
+        ([year: year, month: month, day: day] ++ time)
           |> combine
           |> Calendar.NaiveDateTime.subtract(minutes * 60)
       end
