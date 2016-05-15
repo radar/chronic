@@ -31,6 +31,21 @@ defmodule Chronic do
 
       iex> Chronic.parse("aug 2nd 9:15am", currently: {{2016, 1, 1}, {0,0,0}})
       { :ok, %Calendar.NaiveDateTime{day: 2, hour: 9, min: 15, month: 8, sec: 0, usec: 0, year: 2016}, 0 }     
+
+      iex> Chronic.parse("aug. 2nd 9:15am", currently: {{2016, 1, 1}, {0,0,0}})
+      { :ok, %Calendar.NaiveDateTime{day: 2, hour: 9, min: 15, month: 8, sec: 0, usec: 0, year: 2016}, 0 }     
+
+      iex> Chronic.parse("2 aug 9:15am", currently: {{2016, 1, 1}, {0,0,0}})
+      { :ok, %Calendar.NaiveDateTime{day: 2, hour: 9, min: 15, month: 8, sec: 0, usec: 0, year: 2016}, 0 }     
+
+      iex> Chronic.parse("2 aug at 9:15am", currently: {{2016, 1, 1}, {0,0,0}})
+      { :ok, %Calendar.NaiveDateTime{day: 2, hour: 9, min: 15, month: 8, sec: 0, usec: 0, year: 2016}, 0 }     
+
+      iex> Chronic.parse("2nd of aug 9:15am", currently: {{2016, 1, 1}, {0,0,0}})
+      { :ok, %Calendar.NaiveDateTime{day: 2, hour: 9, min: 15, month: 8, sec: 0, usec: 0, year: 2016}, 0 }     
+
+      iex> Chronic.parse("2nd of aug at 9:15am", currently: {{2016, 1, 1}, {0,0,0}})
+      { :ok, %Calendar.NaiveDateTime{day: 2, hour: 9, min: 15, month: 8, sec: 0, usec: 0, year: 2016}, 0 }     
   """
   def parse(time, opts \\ []) do
     case Calendar.NaiveDateTime.Parse.iso8601(time) do
@@ -54,17 +69,47 @@ defmodule Chronic do
 
   # Aug 2
   defp process([month: month, number: day], [currently: currently]) do
-    { :ok, combine(currently, month: month, day: day) }
+    process_day_and_month(currently, day, month)
   end
 
   # Aug 2 9am
   defp process([month: month, number: day, time: time], [currently: currently]) do
-    { :ok, combine(currently, month: month, day: day, time: time) }
+    process_day_and_month(currently, day, month, time)
   end
 
   # Aug 2 at 9am
   defp process([month: month, number: day, word: "at", time: time], [currently: currently]) do
-    { :ok, combine(currently, month: month, day: day, time: time) }
+    process_day_and_month(currently, day, month, time)
+  end
+
+  # 2 Aug
+  defp process([number: day, month: month], [currently: currently]) do
+    process_day_and_month(currently, day, month)
+  end
+
+  # 2 Aug 9am
+  defp process([number: day, month: month, time: time], [currently: currently]) do
+    process_day_and_month(currently, day, month, time)
+  end
+
+  # 2 Aug at 9am
+  defp process([number: day, month: month, word: "at", time: time], [currently: currently]) do
+    process_day_and_month(currently, day, month, time)
+  end
+
+  # 2nd of Aug
+  defp process([number: day, word: "of", month: month], [currently: currently]) do
+    process_day_and_month(currently, day, month)
+  end
+
+  # 2nd of Aug 9am
+  defp process([number: day, word: "of", month: month, time: time], [currently: currently]) do
+    process_day_and_month(currently, day, month, time)
+  end
+
+  # 2nd of Aug at 9am
+  defp process([number: day, word: "of", month: month, word: "at", time: time], [currently: currently]) do
+    process_day_and_month(currently, day, month, time)
   end
 
   # 9am
@@ -157,6 +202,14 @@ defmodule Chronic do
 
   defp process(_, _opts) do
     { :error, :unknown_format }
+  end
+
+  defp process_day_and_month(currently, day, month) do
+    { :ok, combine(currently, month: month, day: day) }
+  end
+
+  defp process_day_and_month(currently, day, month, time) do
+    { :ok, combine(currently, month: month, day: day, time: time) }
   end
 
   defp process_day_of_the_week_with_time(currently, day_of_the_week, time) do
