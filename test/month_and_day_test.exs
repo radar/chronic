@@ -66,4 +66,25 @@ defmodule Chronic.MonthAndDayTest do
     assert time == %Calendar.NaiveDateTime{year: current_year, month: 5, day: 28, hour: 5, min: 32, sec: 19, usec: 764}
     assert offset == 0
   end
+
+  test "parsing with year when all numbers are less than or equal to 31" do
+    { :ok, time, offset } = Chronic.parse("20-aug-16")
+    assert time == %Calendar.NaiveDateTime{year: 2016, month: 8, day: 20, hour: 0, min: 0, sec: 0, usec: 0}
+    assert offset == 0
+
+    { :ok, time, offset } = Chronic.parse("16-aug-20")
+    assert time == %Calendar.NaiveDateTime{year: 2020, month: 8, day: 16, hour: 0, min: 0, sec: 0, usec: 0}
+    assert offset == 0
+  end
+
+  test "parsing with year when one number is greater than 31" do
+    { :ok, time, offset } = Chronic.parse("2016-aug-20")
+    assert time == %Calendar.NaiveDateTime{year: 2016, month: 8, day: 20, hour: 0, min: 0, sec: 0, usec: 0}
+    assert offset == 0
+
+    { :ok, time, offset } = Chronic.parse("16-aug-2020")
+    assert time == %Calendar.NaiveDateTime{year: 2020, month: 8, day: 16, hour: 0, min: 0, sec: 0, usec: 0}
+    assert offset == 0
+  end
+
 end
