@@ -11,8 +11,8 @@ Add it as a dependency to your project:
 ```elixir
 defp deps do
   [
-    {:chronic, git: "git://github.com/radar/chronic"},
- ]
+    {:chronic, "~> 1.1.2"},
+  ]
 end
 ```
 
