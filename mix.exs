@@ -3,7 +3,7 @@ defmodule Chronic.Mixfile do
 
   def project do
     [app: :chronic,
-     version: "1.1.0",
+     version: "1.1.2",
      elixir: "~> 1.2",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
@@ -27,7 +27,7 @@ defmodule Chronic.Mixfile do
     [
       name: :chronic,
       description: "Natural language datetime parser.",
-      files: ["lib", "README*"],
+      files: ["lib", "README*", "mix.exs"],
       maintainers: ["Ryan Bigg"],
       licenses: ["MIT"],
       links: %{"GitHub" => "https://github.com/radar/chronic"}
