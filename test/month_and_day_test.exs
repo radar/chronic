@@ -49,6 +49,18 @@ defmodule Chronic.MonthAndDayTest do
     assert offset == 0
   end
 
+  test "month with day, and PM time with space formatting" do
+    { :ok, time, offset } = Chronic.parse("aug 3 5:26 pm")
+    assert time == %Calendar.NaiveDateTime{year: current_year, day: 3, hour: 17, min: 26, month: 8, sec: 0, usec: 0}
+    assert offset == 0
+  end
+
+  test "month with day, and AM time with space formatting" do
+    { :ok, time, offset } = Chronic.parse("aug 3 9:26 am")
+    assert time == %Calendar.NaiveDateTime{year: current_year, month: 8, day: 3, hour: 9, min: 26, sec: 0, usec: 0}
+    assert offset == 0
+  end
+
   test "month with day, with 'at' AM time" do
     { :ok, time, offset } = Chronic.parse("aug 3 at 9:26am")
     assert time == %Calendar.NaiveDateTime{year: current_year, month: 8, day: 3, hour: 9, min: 26, sec: 0, usec: 0}

@@ -9,6 +9,13 @@ defmodule Chronic.PlainTimeTest do
     assert offset == 0
   end
 
+  test "11 am" do
+    { :ok, time, offset } = Chronic.parse("11 am", currently: frozen_time)
+
+    assert time == %Calendar.NaiveDateTime{year: 2015, month: 5, day: 9, hour: 11, min: 0, sec: 0, usec: 0}
+    assert offset == 0
+  end
+
   test "10 to 8" do
     { :ok, time, offset } = Chronic.parse("10 to 8", currently: frozen_time)
 
@@ -18,6 +25,13 @@ defmodule Chronic.PlainTimeTest do
 
   test "10 to 8pm" do
     { :ok, time, offset } = Chronic.parse("10 to 8pm", currently: frozen_time)
+
+    assert time == %Calendar.NaiveDateTime{year: 2015, month: 5, day: 9, hour: 19, min: 50, sec: 0, usec: 0}
+    assert offset == 0
+  end
+
+  test "10 to 8 pm" do
+    { :ok, time, offset } = Chronic.parse("10 to 8 pm", currently: frozen_time)
 
     assert time == %Calendar.NaiveDateTime{year: 2015, month: 5, day: 9, hour: 19, min: 50, sec: 0, usec: 0}
     assert offset == 0

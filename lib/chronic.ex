@@ -46,6 +46,9 @@ defmodule Chronic do
 
       iex> Chronic.parse("2nd of aug at 9:15am", currently: {{2016, 1, 1}, {0,0,0}})
       { :ok, %Calendar.NaiveDateTime{day: 2, hour: 9, min: 15, month: 8, sec: 0, usec: 0, year: 2016}, 0 }
+
+      iex> Chronic.parse("2nd of aug at 9:15 am", currently: {{2016, 1, 1}, {0,0,0}})
+      { :ok, %Calendar.NaiveDateTime{day: 2, hour: 9, min: 15, month: 8, sec: 0, usec: 0, year: 2016}, 0 }
   """
   def parse(time, opts \\ []) do
     case Calendar.NaiveDateTime.Parse.iso8601(time) do
@@ -64,7 +67,7 @@ defmodule Chronic do
   end
 
   defp preprocess(time) do
-    String.replace(time, "-", " ") |> String.split(" ") |> Chronic.Tokenizer.tokenize
+    String.replace(time, "-", " ") |> String.replace(~r/(?<=\d)\s+(?=[a|p]m\b)/i, "") |> String.split(" ") |> Chronic.Tokenizer.tokenize
   end
 
   # Aug 2
