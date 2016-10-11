@@ -11,41 +11,41 @@ defmodule Chronic do
     ISO8601 times will return an offset if one is specified:
 
       iex> Chronic.parse("2012-08-02T13:00:00")
-      { :ok, %Calendar.NaiveDateTime{day: 2, hour: 13, min: 0, month: 8, sec: 0, usec: nil, year: 2012}, nil }
+      { :ok, %NaiveDateTime{day: 2, hour: 13, minute: 0, month: 8, second: 0, microsecond: {0,0}, year: 2012}, nil }
 
       iex> Chronic.parse("2012-08-02T13:00:00+01:00")
-      { :ok, %Calendar.NaiveDateTime{day: 2, hour: 13, min: 0, month: 8, sec: 0, usec: nil, year: 2012}, 3600 }
+      { :ok, %NaiveDateTime{day: 2, hour: 13, minute: 0, month: 8, second: 0, microsecond: {0,0}, year: 2012}, 3600 }
 
     You can pass an option to define the "current" time for Chronic:
 
       iex> Chronic.parse("aug 2", currently: {{1999, 1, 1}, {0,0,0}})
-      { :ok, %Calendar.NaiveDateTime{day: 2, hour: 0, min: 0, month: 8, sec: 0, usec: 0, year: 1999}, 0 }
+      { :ok, %NaiveDateTime{day: 2, hour: 0, minute: 0, month: 8, second: 0, microsecond: {0, 6}, year: 1999}, 0 }
 
     **All examples here use `currently` so that they are not affected by the passing of time. You may leave the `currently` option off.**
 
       iex> Chronic.parse("aug 2 9am", currently: {{2016, 1, 1}, {0,0,0}})
-      { :ok, %Calendar.NaiveDateTime{day: 2, hour: 9, min: 0, month: 8, sec: 0, usec: 0, year: 2016}, 0 }
+      { :ok, %NaiveDateTime{day: 2, hour: 9, minute: 0, month: 8, second: 0, microsecond: {0, 6}, year: 2016}, 0 }
 
       iex> Chronic.parse("aug 2 9:15am", currently: {{2016, 1, 1}, {0,0,0}})
-      { :ok, %Calendar.NaiveDateTime{day: 2, hour: 9, min: 15, month: 8, sec: 0, usec: 0, year: 2016}, 0 }
+      { :ok, %NaiveDateTime{day: 2, hour: 9, minute: 15, month: 8, second: 0, microsecond: {0, 6}, year: 2016}, 0 }
 
       iex> Chronic.parse("aug 2nd 9:15am", currently: {{2016, 1, 1}, {0,0,0}})
-      { :ok, %Calendar.NaiveDateTime{day: 2, hour: 9, min: 15, month: 8, sec: 0, usec: 0, year: 2016}, 0 }
+      { :ok, %NaiveDateTime{day: 2, hour: 9, minute: 15, month: 8, second: 0, microsecond: {0, 6}, year: 2016}, 0 }
 
       iex> Chronic.parse("aug. 2nd 9:15am", currently: {{2016, 1, 1}, {0,0,0}})
-      { :ok, %Calendar.NaiveDateTime{day: 2, hour: 9, min: 15, month: 8, sec: 0, usec: 0, year: 2016}, 0 }
+      { :ok, %NaiveDateTime{day: 2, hour: 9, minute: 15, month: 8, second: 0, microsecond: {0, 6}, year: 2016}, 0 }
 
       iex> Chronic.parse("2 aug 9:15am", currently: {{2016, 1, 1}, {0,0,0}})
-      { :ok, %Calendar.NaiveDateTime{day: 2, hour: 9, min: 15, month: 8, sec: 0, usec: 0, year: 2016}, 0 }
+      { :ok, %NaiveDateTime{day: 2, hour: 9, minute: 15, month: 8, second: 0, microsecond: {0, 6}, year: 2016}, 0 }
 
       iex> Chronic.parse("2 aug at 9:15am", currently: {{2016, 1, 1}, {0,0,0}})
-      { :ok, %Calendar.NaiveDateTime{day: 2, hour: 9, min: 15, month: 8, sec: 0, usec: 0, year: 2016}, 0 }
+      { :ok, %NaiveDateTime{day: 2, hour: 9, minute: 15, month: 8, second: 0, microsecond: {0, 6}, year: 2016}, 0 }
 
       iex> Chronic.parse("2nd of aug 9:15am", currently: {{2016, 1, 1}, {0,0,0}})
-      { :ok, %Calendar.NaiveDateTime{day: 2, hour: 9, min: 15, month: 8, sec: 0, usec: 0, year: 2016}, 0 }
+      { :ok, %NaiveDateTime{day: 2, hour: 9, minute: 15, month: 8, second: 0, microsecond: {0, 6}, year: 2016}, 0 }
 
       iex> Chronic.parse("2nd of aug at 9:15am", currently: {{2016, 1, 1}, {0,0,0}})
-      { :ok, %Calendar.NaiveDateTime{day: 2, hour: 9, min: 15, month: 8, sec: 0, usec: 0, year: 2016}, 0 }
+      { :ok, %NaiveDateTime{day: 2, hour: 9, minute: 15, month: 8, second: 0, microsecond: {0, 6}, year: 2016}, 0 }
   """
   def parse(time, opts \\ []) do
     case Calendar.NaiveDateTime.Parse.iso8601(time) do
@@ -136,7 +136,7 @@ defmodule Chronic do
 
   # 10 to 8
   defp process([number: minutes, word: "to", number: hour], [currently: {{year, month, day}, _}]) do
-    time = combine(year: year, month: month, day: day, hour: hour, minute: 0, second: 0, usec: 0)
+    time = combine(year: year, month: month, day: day, hour: hour, minute: 0, second: 0, microsecond: {0, 6})
 
     time |> Calendar.NaiveDateTime.subtract(minutes * 60)
   end
@@ -151,7 +151,7 @@ defmodule Chronic do
   # half past 2
   # half past 2pm
   defp process([word: "half", word: "past", number: hour], [currently: {{year, month, day}, _}]) do
-    combine(year: year, month: month, day: day, hour: hour, minute: 0, second: 0, usec: 0)
+    combine(year: year, month: month, day: day, hour: hour, minute: 0, second: 0, microsecond: {0, 6})
       |> Calendar.NaiveDateTime.add(30 * 60)
   end
 
@@ -182,7 +182,7 @@ defmodule Chronic do
 
   # Tueesday
   defp process([day_of_the_week: day_of_the_week], [currently: { current_date, _}]) do
-    parts = find_next_day_of_the_week(current_date, day_of_the_week) ++ [hour: 12, minute: 0, second: 0, usec: 0]
+    parts = find_next_day_of_the_week(current_date, day_of_the_week) ++ [hour: 12, minute: 0, second: 0, microsecond: {0, 6}]
     { :ok, combine(parts) }
   end
 
@@ -198,12 +198,12 @@ defmodule Chronic do
 
   # 6 in the morning
   defp process([number: hour, word: "in", word: "the", word: "morning"], [currently: {{year, month, day}, _}]) do
-    { :ok, combine(year: year, month: month, day: day, hour: hour, minute: 0, second: 0, usec: 0) }
+    { :ok, combine(year: year, month: month, day: day, hour: hour, minute: 0, second: 0, microsecond: {0, 6}) }
   end
 
   # 6 in the evening
   defp process([number: hour, word: "in", word: "the", word: "evening"], [currently: {{year, month, day}, _}]) do
-    { :ok, combine(year: year, month: month, day: day, hour: hour + 12, minute: 0, second: 0, usec: 0) }
+    { :ok, combine(year: year, month: month, day: day, hour: hour + 12, minute: 0, second: 0, microsecond: {0, 6}) }
   end
 
   # sat 7 in the evening
@@ -211,7 +211,7 @@ defmodule Chronic do
     hour = hour + 12
     date = date_for(currently) |> find_next_day_of_the_week(day_of_the_week)
 
-    { :ok, combine(date ++ [hour: hour, minute: 0, second: 0, usec: 0]) }
+    { :ok, combine(date ++ [hour: hour, minute: 0, second: 0, microsecond: {0, 6}]) }
   end
 
   defp process(_, _opts) do
@@ -256,11 +256,11 @@ defmodule Chronic do
   end
 
   defp combine(_, month: month, day: day, year: year) do
-    combine(year: year, month: month, day: day, hour: 0, minute: 0, second: 0, usec: 0) |> change_year_to_four_digit()
+    combine(year: year, month: month, day: day, hour: 0, minute: 0, second: 0, microsecond: {0, 6}) |> change_year_to_four_digit()
   end
 
   defp combine({{year, _, _}, _}, month: month, day: day) do
-    combine(year: year, month: month, day: day, hour: 0, minute: 0, second: 0, usec: 0)
+    combine(year: year, month: month, day: day, hour: 0, minute: 0, second: 0, microsecond: {0, 6})
   end
 
   defp combine({{year, _, _}, _}, month: month, day: day, time: time) do
@@ -271,15 +271,15 @@ defmodule Chronic do
     combine([year: year, month: month, day: day] ++ time)
   end
 
-  defp combine(year: year, month: month, day: day, hour: hour, minute: minute, second: second, usec: usec) do
-    {{ year, month, day }, { hour, minute, second }} |> Calendar.NaiveDateTime.from_erl!(usec)
+  defp combine(year: year, month: month, day: day, hour: hour, minute: minute, second: second, microsecond: microsecond) do
+    {{ year, month, day }, { hour, minute, second }} |> Calendar.NaiveDateTime.from_erl!(microsecond)
   end
 
   # TODO - This is taken from Calendar.DateTime.Parse.rfc822_utc/2.
   # Remove when Calendar exposes `change_year_to_four_digit/2` publicly.
-  defp change_year_to_four_digit(%Calendar.NaiveDateTime{year: year} = ndt, year_guess \\ 2016) do
+  defp change_year_to_four_digit(%NaiveDateTime{year: year} = ndt, year_guess \\ 2016) do
     changed_year = year |> two_to_four_digit(year_guess)
-    %Calendar.NaiveDateTime{ndt | year: changed_year}
+    %NaiveDateTime{ndt | year: changed_year}
   end
 
   defp two_to_four_digit(year, year_guess) when year < 100 do
