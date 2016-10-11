@@ -13,7 +13,7 @@ defmodule Chronic.Tokenizer do
   def tokenize(token) do
     token = String.downcase(token)
     ordinal_regex = ~r/\A(?<number>\d+)(st|nd|rd|th)\Z/
-    time_regex = ~r/(?<hour>\d{1,2}):?(?<minute>\d{1,2})?:?(?<second>\d{1,2})?\.?(?<usec>\d{1,6})?(?<am_or_pm>am|pm)?/
+    time_regex = ~r/(?<hour>\d{1,2}):?(?<minute>\d{1,2})?:?(?<second>\d{1,2})?\.?(?<microsecond>\d{1,6})?(?<am_or_pm>am|pm)?/
 
     cond do
       Enum.any?(@abbr_months, fn (month) -> matches_month?(token, month) end) ->
@@ -55,15 +55,15 @@ defmodule Chronic.Tokenizer do
       "hour" => hour,
       "minute" => minute,
       "second" => second,
-      "usec" => usec,
-      "am_or_pm" => am_or_pm 
+      "microsecond" => microsecond,
+      "am_or_pm" => am_or_pm
     } = Regex.named_captures(time_regex, token)
     hour = String.to_integer(hour)
     hour = if am_or_pm == "pm", do: hour + 12, else: hour
     minute = if minute == "", do: 0, else: String.to_integer(minute)
     second = if second == "", do: 0, else: String.to_integer(second)
-    usec = if usec == "", do: 0, else: String.to_integer(usec)
+    microsecond = if microsecond == "", do: 0, else: String.to_integer(microsecond)
 
-    { :time, [hour: hour, minute: minute, second: second, usec: usec] }
+    { :time, [hour: hour, minute: minute, second: second, microsecond: {microsecond,6}] }
   end
 end
