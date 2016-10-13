@@ -68,6 +68,7 @@ defmodule Chronic do
 
   defp preprocess(time) do
     String.replace(time, "-", " ")
+    # Converts strings like "9 am" to "9 am"
     |> String.replace(~r/(?<=\d)\s+(?=[a|p]m\b)/i, "")
     |> String.split(" ")
     |> Chronic.Tokenizer.tokenize
