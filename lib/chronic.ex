@@ -67,7 +67,10 @@ defmodule Chronic do
   end
 
   defp preprocess(time) do
-    String.replace(time, "-", " ") |> String.replace(~r/(?<=\d)\s+(?=[a|p]m\b)/i, "") |> String.split(" ") |> Chronic.Tokenizer.tokenize
+    String.replace(time, "-", " ")
+    |> String.replace(~r/(?<=\d)\s+(?=[a|p]m\b)/i, "")
+    |> String.split(" ")
+    |> Chronic.Tokenizer.tokenize
   end
 
   # Aug 2
