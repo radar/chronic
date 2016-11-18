@@ -59,11 +59,16 @@ defmodule Chronic.Tokenizer do
       "am_or_pm" => am_or_pm
     } = Regex.named_captures(time_regex, token)
     hour = String.to_integer(hour)
-    hour = if am_or_pm == "pm", do: hour + 12, else: hour
+    hour = shift_hour(hour, am_or_pm)
     minute = if minute == "", do: 0, else: String.to_integer(minute)
     second = if second == "", do: 0, else: String.to_integer(second)
     microsecond = if microsecond == "", do: 0, else: String.to_integer(microsecond)
 
     { :time, [hour: hour, minute: minute, second: second, microsecond: {microsecond,6}] }
   end
+
+  defp shift_hour(12, "am"), do: 0
+  defp shift_hour(12, "pm"), do: 12
+  defp shift_hour(hr, "pm"), do: hr + 12
+  defp shift_hour(hr, _   ), do: hr
 end
