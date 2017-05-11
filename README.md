@@ -11,7 +11,7 @@ Add it as a dependency to your project:
 ```elixir
 defp deps do
   [
-    {:chronic, "~> 1.1.2"},
+    {:chronic, "~> 2.0.2"},
   ]
 end
 ```
@@ -30,6 +30,14 @@ If Chronic encounters a format it doesn't recognise, it will return an error tup
 { :error, :unknown_format } = Chronic.parse("definitely not a known format, no siree")
 ```
 
+If `Calendar.NaiveDateTime` doesn't know what you mean (i.e. if you ask for a date such as "January 32nd"), then you'll see this error instead:
+
+```elixir
+{:error, :invalid_datetime} = Chronic.parse("January 32nd")
+```
+
+
+
 If you're not sure what you're going to get back, use a `case`:
 
 ```elixir
@@ -37,7 +45,7 @@ input = "some user input goes here"
 case Chronic.parse(input) do
   { :ok, time, offset } ->
     # do something with time + offset
-  { :error, :unknown_format } -> 
+  { :error, :unknown_format } ->
     # present a good error message to the user
 end
 ```
