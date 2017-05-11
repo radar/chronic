@@ -49,20 +49,34 @@ defmodule Chronic do
 
       iex> Chronic.parse("2nd of aug at 9:15 am", currently: {{2016, 1, 1}, {0,0,0}})
       { :ok, %NaiveDateTime{day: 2, hour: 9, minute: 15, month: 8, second: 0, microsecond: {0,6}, year: 2016}, 0 }
+
+      iex> Chronic.parse("Feb 29", currently: {{2016, 1, 1}, {0,0,0}})
+      { :ok, %NaiveDateTime{day: 29, hour: 0, minute: 0, month: 2, second: 0, microsecond: {0,6}, year: 2016}, 0 }
+
+      iex> Chronic.parse("Feb 29", currently: {{2017, 1, 1}, {0,0,0}})
+      { :error, :invalid_datetime }
+
+      iex> Chronic.parse("Nov 31")
+      { :error, :invalid_datetime }
   """
   def parse(time, opts \\ []) do
     case Calendar.NaiveDateTime.Parse.iso8601(time) do
-      { :ok, time, offset } ->
-        { :ok, time, offset }
-      _ ->
-        currently = opts[:currently] || :calendar.universal_time
-        result = time |> preprocess |> debug(opts[:debug]) |> process(currently: currently)
-        case result do
-          { :ok, time } ->
-            { :ok, time, 0 }
-          error ->
-            error
-        end
+      result = { :ok, _ = %NaiveDateTime{}, _ } -> result
+      _ -> parse_natural_language(time, opts)
+    end
+  end
+
+  defp parse_natural_language(time_as_string, opts) do
+    currently = opts[:currently] || :calendar.universal_time
+    result = try do
+      time_as_string |> preprocess |> debug(opts[:debug]) |> process(currently: currently)
+    rescue
+      e in MatchError -> e.term
+    end
+
+    case result do
+      {:ok, datetime = %NaiveDateTime{} } -> { :ok, datetime, 0 }
+      error -> error
     end
   end
 
