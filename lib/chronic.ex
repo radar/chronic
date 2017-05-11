@@ -49,20 +49,32 @@ defmodule Chronic do
 
       iex> Chronic.parse("2nd of aug at 9:15 am", currently: {{2016, 1, 1}, {0,0,0}})
       { :ok, %NaiveDateTime{day: 2, hour: 9, minute: 15, month: 8, second: 0, microsecond: {0,6}, year: 2016}, 0 }
+
+      iex> Chronic.parse("Feb 29", currently: {{2016, 1, 1}, {0,0,0}})
+      { :ok, %NaiveDateTime{day: 29, hour: 0, minute: 0, month: 2, second: 0, microsecond: {0,6}, year: 2016}, 0 }
+
+      iex> Chronic.parse("Feb 29", currently: {{2017, 1, 1}, {0,0,0}})
+      { :error, :invalid_datetime }
+
+      iex> Chronic.parse("Nov 31")
+      { :error, :invalid_datetime }
   """
   def parse(time, opts \\ []) do
     case Calendar.NaiveDateTime.Parse.iso8601(time) do
-      { :ok, time, offset } ->
-        { :ok, time, offset }
-      _ ->
-        currently = opts[:currently] || :calendar.universal_time
-        result = time |> preprocess |> debug(opts[:debug]) |> process(currently: currently)
-        case result do
-          { :ok, time } ->
-            { :ok, time, 0 }
-          error ->
-            error
-        end
+      result = { :ok, _ = %NaiveDateTime{}, _ } -> result
+      _ -> parse_natural_language(time, opts)
+    end
+  end
+
+  defp parse_natural_language(time_as_string, opts) do
+    currently = opts[:currently] || :calendar.universal_time
+    result = time_as_string |> preprocess |> debug(opts[:debug]) |> process(currently: currently)
+
+    with {:ok, datetime = %NaiveDateTime{} } <- result do
+      { :ok, datetime, 0 }
+    else
+      {:error, :invalid_datetime} -> {:error, :invalid_datetime}
+      {:error, :unknown_format} -> {:error, :unknown_format}
     end
   end
 
@@ -138,28 +150,46 @@ defmodule Chronic do
   # 9:30:15am
   # 9:30:15.123456am
   defp process([time: time], [currently: currently]) do
-    { :ok, combine(currently, time: time) }
+    combine(currently, time: time)
   end
 
   # 10 to 8
   defp process([number: minutes, word: "to", number: hour], [currently: {{year, month, day}, _}]) do
-    time = combine(year: year, month: month, day: day, hour: hour, minute: 0, second: 0, microsecond: {0, 6})
-
-    time |> Calendar.NaiveDateTime.subtract(minutes * 60)
+    with {:ok, datetime} <- combine(
+      year: year,
+      month: month,
+      day: day,
+      hour: hour,
+      minute: 0,
+      second: 0,
+      microsecond: {0, 6}
+    ) do
+      datetime |> Calendar.NaiveDateTime.subtract(minutes * 60)
+    end
   end
 
   # 10 to 8am
   defp process([number: minutes, word: "to", time: time], [currently: {{year, month, day}, _}]) do
-    ([year: year, month: month, day: day] ++ time)
-      |> combine
-      |> Calendar.NaiveDateTime.subtract(minutes * 60)
+    with {:ok, datetime} <- combine([year: year, month: month, day: day] ++ time) do
+      datetime |> Calendar.NaiveDateTime.subtract(minutes * 60)
+    end
   end
 
   # half past 2
   # half past 2pm
   defp process([word: "half", word: "past", number: hour], [currently: {{year, month, day}, _}]) do
-    combine(year: year, month: month, day: day, hour: hour, minute: 0, second: 0, microsecond: {0, 6})
-      |> Calendar.NaiveDateTime.add(30 * 60)
+    dt = combine(
+      year: year,
+      month: month,
+      day: day,
+      hour: hour,
+      minute: 0,
+      second: 0,
+      microsecond: {0, 6}
+    )
+    with {:ok, datetime} <- dt do
+      datetime |> Calendar.NaiveDateTime.add(30 * 60)
+    end
   end
 
   # Yesterday at 9am
@@ -190,7 +220,7 @@ defmodule Chronic do
   # Tueesday
   defp process([day_of_the_week: day_of_the_week], [currently: { current_date, _}]) do
     parts = find_next_day_of_the_week(current_date, day_of_the_week) ++ [hour: 12, minute: 0, second: 0, microsecond: {0, 6}]
-    { :ok, combine(parts) }
+    combine(parts)
   end
 
   # Tuesday 9am
@@ -205,12 +235,12 @@ defmodule Chronic do
 
   # 6 in the morning
   defp process([number: hour, word: "in", word: "the", word: "morning"], [currently: {{year, month, day}, _}]) do
-    { :ok, combine(year: year, month: month, day: day, hour: hour, minute: 0, second: 0, microsecond: {0, 6}) }
+    combine(year: year, month: month, day: day, hour: hour, minute: 0, second: 0, microsecond: {0, 6})
   end
 
   # 6 in the evening
   defp process([number: hour, word: "in", word: "the", word: "evening"], [currently: {{year, month, day}, _}]) do
-    { :ok, combine(year: year, month: month, day: day, hour: hour + 12, minute: 0, second: 0, microsecond: {0, 6}) }
+    combine(year: year, month: month, day: day, hour: hour + 12, minute: 0, second: 0, microsecond: {0, 6})
   end
 
   # sat 7 in the evening
@@ -218,7 +248,7 @@ defmodule Chronic do
     hour = hour + 12
     date = date_for(currently) |> find_next_day_of_the_week(day_of_the_week)
 
-    { :ok, combine(date ++ [hour: hour, minute: 0, second: 0, microsecond: {0, 6}]) }
+    combine(date ++ [hour: hour, minute: 0, second: 0, microsecond: {0, 6}])
   end
 
   defp process(_, _opts) do
@@ -226,44 +256,51 @@ defmodule Chronic do
   end
 
   defp process_day_and_month(currently, day, month) do
-    { :ok, combine(currently, month: month, day: day) }
+    combine(currently, month: month, day: day)
   end
 
   defp process_day_and_month(currently, day, month, time) do
-    { :ok, combine(currently, month: month, day: day, time: time) }
+    combine(currently, month: month, day: day, time: time)
   end
 
   defp process_day_and_month_and_year(currently, day, month, year) do
-    { :ok, combine(currently, month: month, day: day, year: year) }
+    combine(currently, month: month, day: day, year: year)
   end
 
   defp process_day_of_the_week_with_time(currently, day_of_the_week, time) do
     parts = (date_for(currently) |> find_next_day_of_the_week(day_of_the_week))
 
-    { :ok, combine(parts ++ time) }
+    combine(parts ++ time)
   end
 
   defp process_yesterday({{year, month, day}, _}, time) do
-    { :ok, datetime } = combine([year: year, month: month, day: day] ++ time)
-                        |> Calendar.NaiveDateTime.subtract(86400)
-
-    { :ok, datetime }
+    with {:ok, datetime} <- combine([year: year, month: month, day: day] ++ time) do
+      datetime |> Calendar.NaiveDateTime.subtract(86400)
+    end
   end
 
   defp process_tomorrow({{year, month, day}, _}, time) do
-    # Tomorrow at 9am
-    { :ok, datetime } = combine([year: year, month: month, day: day] ++ time)
-                        |> Calendar.NaiveDateTime.add(86400)
-
-    { :ok, datetime }
+    with {:ok, datetime} <- combine([year: year, month: month, day: day] ++ time) do
+      datetime |> Calendar.NaiveDateTime.add(86400)
+    end
   end
 
   defp process_today(currently, time) do
-    { :ok, date_for(currently) |> date_with_time(time) }
+    date_for(currently) |> date_with_time(time)
   end
 
   defp combine(_, month: month, day: day, year: year) do
-    combine(year: year, month: month, day: day, hour: 0, minute: 0, second: 0, microsecond: {0, 6}) |> change_year_to_four_digit()
+    with {:ok, datetime} <- combine(
+      year: year,
+      month: month,
+      day: day,
+      hour: 0,
+      minute: 0,
+      second: 0,
+      microsecond: {0, 6}
+    ) do
+      {:ok, datetime |> change_year_to_four_digit}
+    end
   end
 
   defp combine({{year, _, _}, _}, month: month, day: day) do
@@ -279,7 +316,7 @@ defmodule Chronic do
   end
 
   defp combine(year: year, month: month, day: day, hour: hour, minute: minute, second: second, microsecond: microsecond) do
-    {{ year, month, day }, { hour, minute, second }} |> Calendar.NaiveDateTime.from_erl!(microsecond)
+    {{ year, month, day }, { hour, minute, second }} |> Calendar.NaiveDateTime.from_erl(microsecond)
   end
 
   # TODO - This is taken from Calendar.DateTime.Parse.rfc822_utc/2.
