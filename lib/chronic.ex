@@ -61,10 +61,8 @@ defmodule Chronic do
   """
   def parse(time, opts \\ []) do
     case Calendar.NaiveDateTime.Parse.iso8601(time) do
-      { :ok, time, offset } ->
-        { :ok, time, offset }
-      _ ->
-        parse_natural_language(time, opts)
+      result = { :ok, _ = %NaiveDateTime{}, _ } -> result
+      _ -> parse_natural_language(time, opts)
     end
   end
 
