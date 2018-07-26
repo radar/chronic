@@ -3,8 +3,8 @@ defmodule Chronic.Mixfile do
 
   def project do
     [app: :chronic,
-     version: "2.0.1",
-     elixir: "~> 1.3",
+     version: "3.0.0",
+     elixir: "~> 1.4",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      package: package(),
@@ -12,12 +12,11 @@ defmodule Chronic.Mixfile do
   end
 
   def application do
-    [applications: [:calendar]]
+    [applications: []]
   end
 
   defp deps do
     [
-      {:calendar, "~> 0.14"},
       {:earmark, "~> 0.1", only: :dev},
       {:ex_doc, "~> 0.11", only: :dev}
    ]
