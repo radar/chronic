@@ -8,7 +8,6 @@ defmodule Chronic.ISO8601Test do
     assert offset == nil
   end
 
-  @tag :focus
   test "iso8601 time with offset" do
     { :ok, time, offset } = Chronic.parse("2012-08-02T13:00:00+01:00")
     assert time == %NaiveDateTime{year: 2012, month: 8, day: 2, hour: 13, minute: 0, second: 0, microsecond: {0,0}}
@@ -21,7 +20,6 @@ defmodule Chronic.ISO8601Test do
     assert offset == -25200
   end
 
-  @tag :focus
   test "iso8601 with UTC zone" do
     { :ok, time, offset } = Chronic.parse("2012-08-02T12:00:00Z")
     assert time == %NaiveDateTime{year: 2012, month: 8, day: 2, hour: 12, minute: 0, second: 0, microsecond: {0,0}}

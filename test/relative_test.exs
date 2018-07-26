@@ -32,7 +32,6 @@ defmodule Chronic.RelativeTest do
     assert offset == 0
   end
 
-  @tag :focus
   test "Tuesday" do
     { :ok, time, offset } = Chronic.parse("Tuesday", currently: frozen_time())
     assert time == %NaiveDateTime{year: 2015, month: 5, day: 12, hour: 12, minute: 0, second: 0, microsecond: {0, 6}}
