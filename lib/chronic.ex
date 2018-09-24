@@ -229,8 +229,9 @@ defmodule Chronic do
 
   # Tueesday
   defp process([day_of_the_week: day_of_the_week], [currently: {current_date, _}]) do
-    parts = current_date
-    |> find_next_day_of_the_week(day_of_the_week) ++ [
+    dotw = current_date |> find_next_day_of_the_week(day_of_the_week)
+
+    parts = dotw ++ [
       hour: 12, minute: 0, second: 0, microsecond: {0, 6}
     ]
     combine(parts)
@@ -281,7 +282,25 @@ defmodule Chronic do
   end
 
   defp process_day_of_the_week_with_time(currently, day_of_the_week, time) do
-    parts = currently |> date_for() |> find_next_day_of_the_week(day_of_the_week)
+    current_date_erl = date_for(currently)
+    current_date_day_of_week =
+      current_date_erl
+      |> Date.from_erl!()
+      |> Date.day_of_week()
+    current_time = NaiveDateTime.from_erl!(currently)
+
+    [hour: hours, minute: minutes, second: seconds, microsecond: _] = time
+    parsed_time = NaiveDateTime.from_erl!({current_date_erl, {hours, minutes, seconds}})
+
+    is_same_day = current_date_day_of_week == day_of_the_week
+    is_later_today = is_same_day && current_time < parsed_time
+
+    parts = if is_later_today do
+      %{year: year, month: month, day: day} = Date.from_erl!(current_date_erl)
+      [year: year, month: month, day: day]
+    else
+      (current_date_erl |> find_next_day_of_the_week(day_of_the_week))
+    end
 
     combine(parts ++ time)
   end

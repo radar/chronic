@@ -51,13 +51,13 @@ defmodule Chronic.RelativeTest do
   end
 
   test "Tuesday 4pm - at 9am same day" do
-    { :ok, time, offset } = Chronic.parse("Tuesday 4pm", currently: {{2018, 9, 25}, {9, 0, 0}})
+    {:ok, time, offset} = Chronic.parse("Tuesday 4pm", currently: {{2018, 9, 25}, {9, 0, 0}})
     assert time == %NaiveDateTime{year: 2018, month: 9, day: 25, hour: 16, minute: 0, second: 0, microsecond: {0, 6}}
     assert offset == 0
   end
 
   test "Tuesday 4pm - at 4pm same day" do
-    { :ok, time, offset } = Chronic.parse("Tuesday 4pm", currently: {{2018, 9, 25}, {16, 0, 0}})
+    {:ok, time, offset} = Chronic.parse("Tuesday 4pm", currently: {{2018, 9, 25}, {16, 0, 0}})
     assert time == %NaiveDateTime{year: 2018, month: 10, day: 2, hour: 16, minute: 0, second: 0, microsecond: {0, 6}}
     assert offset == 0
   end
