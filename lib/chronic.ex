@@ -1,4 +1,6 @@
 defmodule Chronic do
+  alias Chronic.Tokenizer
+
   @moduledoc """
     Chronic is a Pure Elixir natural language parser for times and dates
   """
@@ -62,7 +64,7 @@ defmodule Chronic do
   def parse(time, opts \\ []) do
     case DateTime.from_iso8601(time) do
       {:ok, %DateTime{} = dt, offset} ->
-        ndt = DateTime.to_naive(dt) |> NaiveDateTime.add(offset)
+        ndt = dt |> DateTime.to_naive() |> NaiveDateTime.add(offset)
         {:ok, ndt, offset}
 
       {:error, :missing_offset} ->
@@ -77,8 +79,8 @@ defmodule Chronic do
     currently = opts[:currently] || :calendar.universal_time
     result = time_as_string |> preprocess |> debug(opts[:debug]) |> process(currently: currently)
 
-    with {:ok, datetime = %NaiveDateTime{} } <- result do
-      { :ok, datetime, 0 }
+    with {:ok, datetime = %NaiveDateTime{}} <- result do
+      {:ok, datetime, 0}
     else
       {:error, :invalid_date} -> {:error, :invalid_datetime}
       {:error, :unknown_format} -> {:error, :unknown_format}
@@ -86,11 +88,12 @@ defmodule Chronic do
   end
 
   defp preprocess(time) do
-    String.replace(time, "-", " ")
+    time
+    |> String.replace("-", " ")
     # Converts strings like "9 am" to "9 am"
     |> String.replace(~r/(?<=\d)\s+(?=[a|p]m\b)/i, "")
     |> String.split(" ")
-    |> Chronic.Tokenizer.tokenize
+    |> Tokenizer.tokenize
   end
 
   # Aug 2
@@ -225,8 +228,11 @@ defmodule Chronic do
   end
 
   # Tueesday
-  defp process([day_of_the_week: day_of_the_week], [currently: { current_date, _}]) do
-    parts = find_next_day_of_the_week(current_date, day_of_the_week) ++ [hour: 12, minute: 0, second: 0, microsecond: {0, 6}]
+  defp process([day_of_the_week: day_of_the_week], [currently: {current_date, _}]) do
+    parts = current_date
+    |> find_next_day_of_the_week(day_of_the_week) ++ [
+      hour: 12, minute: 0, second: 0, microsecond: {0, 6}
+    ]
     combine(parts)
   end
 
@@ -253,13 +259,13 @@ defmodule Chronic do
   # sat 7 in the evening
   defp process([day_of_the_week: day_of_the_week, number: hour, word: "in", word: "the", word: "evening"], [currently: currently]) do
     hour = hour + 12
-    date = date_for(currently) |> find_next_day_of_the_week(day_of_the_week)
+    date = currently |> date_for() |> find_next_day_of_the_week(day_of_the_week)
 
     combine(date ++ [hour: hour, minute: 0, second: 0, microsecond: {0, 6}])
   end
 
   defp process(_, _opts) do
-    { :error, :unknown_format }
+    {:error, :unknown_format}
   end
 
   defp process_day_and_month(currently, day, month) do
@@ -275,25 +281,25 @@ defmodule Chronic do
   end
 
   defp process_day_of_the_week_with_time(currently, day_of_the_week, time) do
-    parts = (date_for(currently) |> find_next_day_of_the_week(day_of_the_week))
+    parts = currently |> date_for() |> find_next_day_of_the_week(day_of_the_week)
 
     combine(parts ++ time)
   end
 
   defp process_yesterday({{year, month, day}, _}, time) do
     with {:ok, datetime} <- combine([year: year, month: month, day: day] ++ time) do
-      {:ok, datetime |> NaiveDateTime.add(-86400)}
+      {:ok, datetime |> NaiveDateTime.add(-86_400)}
     end
   end
 
   defp process_tomorrow({{year, month, day}, _}, time) do
     with {:ok, datetime} <- combine([year: year, month: month, day: day] ++ time) do
-      {:ok, datetime |> NaiveDateTime.add(86400)}
+      {:ok, datetime |> NaiveDateTime.add(86_400)}
     end
   end
 
   defp process_today(currently, time) do
-    date_for(currently) |> date_with_time(time)
+    currently |> date_for() |> date_with_time(time)
   end
 
   defp combine(_, month: month, day: day, year: year) do
@@ -323,7 +329,7 @@ defmodule Chronic do
   end
 
   defp combine(year: year, month: month, day: day, hour: hour, minute: minute, second: second, microsecond: microsecond) do
-    {{ year, month, day }, { hour, minute, second }} |> NaiveDateTime.from_erl(microsecond)
+    {{year, month, day}, {hour, minute, second}} |> NaiveDateTime.from_erl(microsecond)
   end
 
   defp change_year_to_four_digit(%NaiveDateTime{year: year} = ndt, year_guess \\ 2016) do
@@ -339,21 +345,22 @@ defmodule Chronic do
   defp closest_year(two_digit_year, year_guessing_base) do
     two_digit_year
     |> possible_years(year_guessing_base)
-    |> Enum.map(fn year -> {year, abs(year_guessing_base-year)} end)
+    |> Enum.map(fn year -> {year, abs(year_guessing_base - year)} end)
     |> Enum.min_by(fn {_year, diff} -> diff end)
     |> elem(0)
   end
 
   defp possible_years(two_digit_year, year_guessing_base) do
-    centuries_for_guessing_base(year_guessing_base)
-    |> Enum.map(&(&1+two_digit_year))
+    year_guessing_base
+    |> centuries_for_guessing_base()
+    |> Enum.map(&(&1 + two_digit_year))
   end
 
   # The three centuries closest to the guessing base
   # if you provide e.g. 2016 it should return [1900, 2000, 2100]
   defp centuries_for_guessing_base(year_guessing_base) do
-    base_century = year_guessing_base-rem(year_guessing_base, 100)
-    [base_century-100, base_century, base_century+100]
+    base_century = year_guessing_base - rem(year_guessing_base, 100)
+    [base_century - 100, base_century, base_century + 100]
   end
 
   defp find_next_day_of_the_week(current_date, day_of_the_week) do
@@ -365,7 +372,7 @@ defmodule Chronic do
     tomorrow = Date.add(current_date, 1)
 
     if Date.day_of_week(tomorrow) == day_of_the_week do
-      %{ year: year, month: month, day: day } = tomorrow
+      %{year: year, month: month, day: day} = tomorrow
       [year: year, month: month, day: day]
     else
       find_next_day_of_the_week(tomorrow, day_of_the_week)
@@ -381,6 +388,7 @@ defmodule Chronic do
   end
 
   defp debug(result, debug) when debug == true do
+    # credo:disable-for-next-line
     IO.inspect(result)
   end
 
