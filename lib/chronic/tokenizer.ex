@@ -1,4 +1,5 @@
 defmodule Chronic.Tokenizer do
+  @moduledoc false
   @day_names ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"]
   @abbr_months ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"]
 
@@ -13,6 +14,7 @@ defmodule Chronic.Tokenizer do
   def tokenize(token) do
     token = String.downcase(token)
     ordinal_regex = ~r/\A(?<number>\d+)(st|nd|rd|th)\Z/
+    # credo:disable-for-next-line
     time_regex = ~r/(?<hour>\d{1,2}):?(?<minute>\d{1,2})?:?(?<second>\d{1,2})?\.?(?<microsecond>\d{1,6})?(?<am_or_pm>am|pm)?/
 
     cond do
@@ -64,7 +66,7 @@ defmodule Chronic.Tokenizer do
     second = if second == "", do: 0, else: String.to_integer(second)
     microsecond = if microsecond == "", do: 0, else: String.to_integer(microsecond)
 
-    { :time, [hour: hour, minute: minute, second: second, microsecond: {microsecond,6}] }
+    {:time, [hour: hour, minute: minute, second: second, microsecond: {microsecond, 6}]}
   end
 
   defp shift_hour(12, "am"), do: 0
