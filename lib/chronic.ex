@@ -326,8 +326,6 @@ defmodule Chronic do
     {{ year, month, day }, { hour, minute, second }} |> NaiveDateTime.from_erl(microsecond)
   end
 
-  # TODO - This is taken from Calendar.DateTime.Parse.rfc822_utc/2.
-  # Remove when Calendar exposes `change_year_to_four_digit/2` publicly.
   defp change_year_to_four_digit(%NaiveDateTime{year: year} = ndt, year_guess \\ 2016) do
     changed_year = year |> two_to_four_digit(year_guess)
     %NaiveDateTime{ndt | year: changed_year}
