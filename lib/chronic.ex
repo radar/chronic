@@ -392,9 +392,8 @@ defmodule Chronic do
 
     # This is needed as Date.day_of_week is based on Monday = 1 to Sunday = 7
     # The Chronic week, however, has Monday = 1, Saturday = 6, and Sunday = 0
-    tomorrow_day_of_week =
-      with dow <- Date.day_of_week(tomorrow),
-        do: if Date.day_of_week(tomorrow) == 7, do: 0, else: dow
+    dow = Date.day_of_week(tomorrow)
+    tomorrow_day_of_week = if dow == 7, do: 0, else: dow
 
     if tomorrow_day_of_week == day_of_the_week do
       %{year: year, month: month, day: day} = tomorrow
