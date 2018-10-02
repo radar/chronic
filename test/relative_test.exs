@@ -74,6 +74,42 @@ defmodule Chronic.RelativeTest do
     assert offset == 0
   end
 
+  test "Monday 12pm" do
+    {:ok, time, offset} = Chronic.parse("Monday 12pm", currently: {{2018, 9, 28}, {8, 0, 0}})
+    assert time == %NaiveDateTime{year: 2018, month: 10, day: 1, hour: 12, minute: 0, second: 0, microsecond: {0, 6}}
+    assert offset == 0
+  end
+
+  test "Tuesday 12pm" do
+    {:ok, time, offset} = Chronic.parse("Tuesday 12pm", currently: {{2018, 9, 28}, {8, 0, 0}})
+    assert time == %NaiveDateTime{year: 2018, month: 10, day: 2, hour: 12, minute: 0, second: 0, microsecond: {0, 6}}
+    assert offset == 0
+  end
+
+  test "Wednesday 12pm" do
+    {:ok, time, offset} = Chronic.parse("Wednesday 12pm", currently: {{2018, 9, 28}, {8, 0, 0}})
+    assert time == %NaiveDateTime{year: 2018, month: 10, day: 03, hour: 12, minute: 0, second: 0, microsecond: {0, 6}}
+    assert offset == 0
+  end
+
+  test "Thursday 12pm" do
+    {:ok, time, offset} = Chronic.parse("Thursday 12pm", currently: {{2018, 9, 28}, {8, 0, 0}})
+    assert time == %NaiveDateTime{year: 2018, month: 10, day: 4, hour: 12, minute: 0, second: 0, microsecond: {0, 6}}
+    assert offset == 0
+  end
+
+  test "Friday 12pm" do
+    {:ok, time, offset} = Chronic.parse("Friday 12pm", currently: {{2018, 9, 28}, {8, 0, 0}})
+    assert time == %NaiveDateTime{year: 2018, month: 9, day: 28, hour: 12, minute: 0, second: 0, microsecond: {0, 6}}
+    assert offset == 0
+  end
+
+  test "Saturday 12pm" do
+    {:ok, time, offset} = Chronic.parse("Saturday 12pm", currently: {{2018, 9, 28}, {8, 0, 0}})
+    assert time == %NaiveDateTime{year: 2018, month: 9, day: 29, hour: 12, minute: 0, second: 0, microsecond: {0, 6}}
+    assert offset == 0
+  end
+
   test "6 in the morning" do
     {:ok, time, offset} = Chronic.parse("6 in the morning", currently: frozen_time())
     assert time == %NaiveDateTime{year: 2015, month: 5, day: 9, hour: 6, minute: 0, second: 0, microsecond: {0, 6}}
