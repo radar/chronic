@@ -11,7 +11,7 @@ Add it as a dependency to your project:
 ```elixir
 defp deps do
   [
-    {:chronic, "~> 3.1"},
+    {:chronic, "~> 3.2"},
   ]
 end
 ```
