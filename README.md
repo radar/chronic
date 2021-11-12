@@ -1,6 +1,11 @@
 # Chronic
 
 [![Build Status](https://travis-ci.org/radar/chronic.svg?branch=master)](https://travis-ci.org/radar/chronic)
+[![Module Version](https://img.shields.io/hexpm/v/chronic.svg)](https://hex.pm/packages/chronic)
+[![Hex Docs](https://img.shields.io/badge/hex-docs-lightgreen.svg)](https://hexdocs.pm/chronic/)
+[![Total Download](https://img.shields.io/hexpm/dt/chronic.svg)](https://hex.pm/packages/chronic)
+[![License](https://img.shields.io/hexpm/l/chronic.svg)](https://github.com/radar/chronic/blob/master/LICENSE.md)
+[![Last Updated](https://img.shields.io/github/last-commit/radar/chronic.svg)](https://github.com/radar/chronic/commits/master)
 
 Like [Chronic](http://rubygems.org/gems/chronic), but for Elixir.
 
@@ -42,7 +47,7 @@ This is probably not what you want because it's a date in Melbourne's past but U
 {:ok, ~N[2018-10-02 12:00:00.000000], 0}
 ```
 
-This is a better time because it's in the future; probbaly what you want.
+This is a better time because it's in the future; probably what you want.
 
 However, it's important to note here that the `offset` value will be `0` rather than the correct timezone, so it's better ignored in this case.
 
@@ -73,3 +78,10 @@ case Chronic.parse(input) do
     # present a good error message to the user
 end
 ```
+
+## Copyright and License
+
+Copyright (c) 2016 Ryan Bigg
+
+This work is free. You can redistribute it and/or modify it under the
+terms of the MIT License. See the [LICENSE.md](./LICENSE.md) file for more details.
