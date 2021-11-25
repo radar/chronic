@@ -1,16 +1,15 @@
 defmodule Chronic do
-  alias Chronic.Tokenizer
-
   @moduledoc """
-    Chronic is a Pure Elixir natural language parser for times and dates
+  Chronic is a Pure Elixir natural language parser for times and dates.
   """
 
   @doc """
-    Parses the specified time. Will return `{:ok, time, utc_offset}` if it knows a time, otherwise `{:error, :unknown_format}`
+  Parses the specified time. Will return `{:ok, time, utc_offset}` if it knows
+  a time, otherwise `{:error, :unknown_format}`.
 
-    ## Examples
+  ## Examples
 
-    ISO8601 times will return an offset if one is specified:
+  ISO8601 times will return an offset if one is specified:
 
       iex> Chronic.parse("2012-08-02T13:00:00")
       { :ok, %NaiveDateTime{day: 2, hour: 13, minute: 0, month: 8, second: 0, microsecond: {0,0}, year: 2012}, nil }
@@ -18,12 +17,13 @@ defmodule Chronic do
       iex> Chronic.parse("2012-08-02T13:00:00+01:00")
       { :ok, %NaiveDateTime{day: 2, hour: 13, minute: 0, month: 8, second: 0, microsecond: {0,0}, year: 2012}, 3600 }
 
-    You can pass an option to define the "current" time for Chronic:
+  You can pass an option to define the "current" time for Chronic:
 
       iex> Chronic.parse("aug 2", currently: {{1999, 1, 1}, {0,0,0}})
       { :ok, %NaiveDateTime{day: 2, hour: 0, minute: 0, month: 8, second: 0, microsecond: {0, 6}, year: 1999}, 0 }
 
-    **All examples here use `currently` so that they are not affected by the passing of time. You may leave the `currently` option off.**
+  **All examples here use `currently` so that they are not affected by the
+  passing of time. You may leave the `currently` option off.**
 
       iex> Chronic.parse("aug 2 9am", currently: {{2016, 1, 1}, {0,0,0}})
       { :ok, %NaiveDateTime{day: 2, hour: 9, minute: 0, month: 8, second: 0, microsecond: {0, 6}, year: 2016}, 0 }
@@ -60,7 +60,11 @@ defmodule Chronic do
 
       iex> Chronic.parse("Nov 31")
       { :error, :invalid_datetime }
+
   """
+
+  alias Chronic.Tokenizer
+
   def parse(time, opts \\ []) do
     case DateTime.from_iso8601(time) do
       {:ok, %DateTime{} = dt, offset} ->
